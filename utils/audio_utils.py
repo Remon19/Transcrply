@@ -2,6 +2,7 @@ import os
 import subprocess
 import wave
 import math
+import ffmpeg
 from pathlib import Path
 from pydub import AudioSegment
 from pydub.silence import detect_nonsilent, split_on_silence
@@ -11,10 +12,21 @@ from pydub.silence import detect_nonsilent, split_on_silence
 def ExtractAudio(filepath):
     directory = os.path.dirname(filepath)  # directory of file
     convfilepath = directory + '/' + Path(filepath).stem + '_conv'
-    command = "ffmpeg -hide_banner -loglevel error -y  -i {} -ab 256k -ac 1 -ar 16000 -vn {}.wav".format(
-        filepath, convfilepath)
-    result = subprocess.run(command, shell=True, stdout=subprocess.PIPE)
-    return convfilepath, result.returncode
+    # command = "ffmpeg -hide_banner -loglevel error -y  -i {} -ab 256k -ac 1 -ar 16000 -vn {}.wav".format(
+    #     filepath, convfilepath)
+    # result = subprocess.run(command, shell=True, stdout=subprocess.PIPE)
+    try:
+        ffmpeg.input(filepath).output(
+            convfilepath,
+            ab='256k',
+            ac=1,
+            ar=16000,
+            vn=None
+        ).overwrite_output().run(quiet=True)
+        return convfilepath, 0  # success
+    except ffmpeg.Error as e:
+        print("FFmpeg error:", e.stderr.decode() if e.stderr else str(e))
+        return None, 1  # failure
 
 
 def GetAudioSegment(filename, segment_number, start, end, limit,seg_length, over_lap=0.5):
