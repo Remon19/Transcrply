@@ -1,2 +1,10 @@
 pyproject.toml
 poetry.lock
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest cache
+.pytest_cache/
