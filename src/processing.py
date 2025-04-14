@@ -1,16 +1,18 @@
 import math
-import whisper
-import torch
-import librosa
-import demucs
 from os import path
-from utils.audio_utils import GetAudioSegment, SplitOnSilence
+import demucs.separate
+import librosa
+import torch
+import whisper
+
+from utils.audio_utils import ExtractAudio, GetAudioSegment, SplitOnSilence
+from utils.misc import remove_directory, get_project_root
 from utils.segments_utils import HandleLessThanSec, SplitLongDuration
-from utils.sub_utils import FormatTime, AdjustSrtIndex, BreakLongTranscription
-from utils.misc import remove_directory
+from utils.sub_utils import AdjustSrtIndex, BreakLongTranscription, FormatTime
+
 
 def Separate_Vocals(audiopath):
-    curr_dir = '/ai-workspace/Remon/MediaTranscription'
+    curr_dir = get_project_root(2)
     demucs.separate.main(["--two-stems", "vocals", "-n", "mdx_extra", f"{audiopath}"])
     print('done')
     vocalPath = curr_dir + '/separated/mdx_extra/' + path.splitext(path.basename(audiopath))[0] + '/vocals.wav'
